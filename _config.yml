@@ -1,0 +1,43 @@
+# Site settings
+title: Tactical Tilter
+description: "A blog about random pathways of thought and a bit about programming"
+baseurl: "" # for test: remove string '/space-jekyll-templa' to ''
+url: "https://deltamanic.github.io" # for test: remove string 'http://victorvoid.github.io' to '' but in production: 'https://yourusername.githu.io'
+# User settings
+# User settings
+username: i077570
+user_title: Harikrishnan Menon
+email: harikrishnan.menon@sap.com
+twitter_username: delta_maniac
+github_username: DeltaManiac 
+gplus_username: +HarikrishnanMenon91
+#disqus_username: loremipsum
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: /:title/
+
+
+# html minify
+compress_html:
+  clippings: all
+  comments: all
+  endings: []
+  profile: false
+
+# Links to include in menu navigation
+links:
+  - title: home
+    url: /
+  - title: my posts
+    url: /posts/
+  - title: series
+    url: /series/
+  - title: tags
+    url: /tags/
+  - title: about me
+    url: /about/
+  
+# exclude my node related stuff
+exclude: ['package.json', 'src', 'node_modules']
