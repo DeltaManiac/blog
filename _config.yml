@@ -7,7 +7,7 @@ url: "https://deltamaniac.github.io" # for test: remove string 'http://victorvoi
 # User settings
 username: DeltaManiac 
 user_title: Harikrishnan Menon
-email: maxpaynered@gmail.com
+email: maxpaynered@gmail.com 
 twitter_username: delta_maniac
 github_username: DeltaManiac 
 gplus_username: +HarikrishnanMenon91
@@ -29,11 +29,11 @@ compress_html:
 # Links to include in menu navigation
 links:
   - title: home
-    url: / 
+    url: /
   - title: my posts
-    url: /posts
+    url: /posts/
   - title: series
-  url: /series/
+    url: /series/
   - title: tags
     url: /tags/
   - title: about me
