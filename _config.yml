@@ -2,7 +2,7 @@
 title: Tactical Tilter
 description: "A blog about random pathways of thought and a bit about programming"
 baseurl: "" # for test: remove string '/space-jekyll-templa' to ''
-url: "https://deltamanic.github.io" # for test: remove string 'http://victorvoid.github.io' to '' but in production: 'https://yourusername.githu.io'
+url: "https://deltamaniac.github.io" # for test: remove string 'http://victorvoid.github.io' to '' but in production: 'https://yourusername.githu.io'
 # User settings
 # User settings
 username: DeltaManiac 
@@ -29,11 +29,11 @@ compress_html:
 # Links to include in menu navigation
 links:
   - title: home
-    url: 
+    url:/ 
   - title: my posts
     url: /posts
   - title: series
-    url: /series/
+  url: /series/
   - title: tags
     url: /tags/
   - title: about me
