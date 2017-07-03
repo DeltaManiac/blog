@@ -43,7 +43,7 @@ projects:
   - name: rust_proto 
     url: https://github.com/deltamaniac/rust_proto
   - name: rusty_cmis 
-    url: https://github.com/deltamaniac/rusty_cmis
+    url: https://github.com/deltamaniac/rusty_cmis/
 
 # exclude my node related stuff
 exclude: ['package.json', 'src', 'node_modules']
