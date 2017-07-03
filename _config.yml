@@ -39,7 +39,7 @@ links:
   - title: about me
     url: /about/
   
-  projects:
+projects:
   - name: rust_proto 
     url: https://github.com/deltamaniac/rust_proto
   - name: rusty_cmis 
