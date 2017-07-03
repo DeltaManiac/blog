@@ -10,7 +10,7 @@ user_title: Harikrishnan Menon
 email: maxpaynered@gmail.com 
 twitter_username: delta_maniac
 github_username: DeltaManiac 
-gplus_username: +HarikrishnanMenon91
+gplus_username: HarikrishnanMenon91
 #disqus_username: loremipsum
 
 # Build settings
@@ -39,5 +39,11 @@ links:
   - title: about me
     url: /about/
   
+  projects:
+  - name: rust_proto 
+    url: https://github.com/deltamaniac/rust_proto
+  - name: rusty_cmis 
+    url: https://github.com/deltamaniac/rusty_cmis
+
 # exclude my node related stuff
 exclude: ['package.json', 'src', 'node_modules']
