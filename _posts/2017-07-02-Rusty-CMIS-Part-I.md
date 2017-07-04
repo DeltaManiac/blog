@@ -82,7 +82,7 @@ mod tests {
     }
     #[test]
     fn it_does_work() {
-        assert!(1==2);
+        assert!(1==1);
     }
 }
 ~~~
