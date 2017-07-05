@@ -2,7 +2,7 @@
 layout: post
 title:  "Rusty CMIS Part II"
 image: 'https://upload.wikimedia.org/wikipedia/en/f/f8/Cmis_logo.png'
-date:   2017-07-03 00:08:06
+date:   2017-07-04 00:08:06
 tags:
 description: 'Writing a CMIS Client in Rust'
 categories:
@@ -11,6 +11,7 @@ categories:
 - Travis
 - Continuous Integration
 serie: learn
+commentIssueId: 1
 ---
 
 ### Objective 
