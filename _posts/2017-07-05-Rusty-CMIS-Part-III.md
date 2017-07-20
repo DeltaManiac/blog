@@ -53,48 +53,63 @@ reqwest = "0.7.1"
 ~~~
 { :.language-toml}
 
-Building out application downloads the carte and its dependencies, then compile them so that we can use it in our application.
+Building out the application now downloads the crate and its dependencies, then compiles them to be used in our application.
 
 
 <img src="{{"../assets/img/rusty_cmis/iii/reqwest_build.png"}}"/>
 
-Cargo downloads the library and its dependencies and compiles them so that we can use them.
-
 
 ### Talking to a Server
 
-Lets us establish a connection to an arbitrary URL and see what happens 
-The example given at the hyper documentation is as follows
+Lets us establish a connection to an arbitrary <a href="https://www.rust-lang.org">URL</a>.
 
 ~~~
-extern crate hyper;
-extern crate service_fn;
+extern crate reqwest;
 
-use hyper::header::{ContentLength, ContentType};
-use hyper::server::{Http, Response};
-use service_fn::service_fn;
-
-static TEXT: &'static str = "Hello, World!";
-
-fn run() -> Result<(), hyper::Error> {
-    let addr = ([127, 0, 0, 1], 3000).into();
-
-    let hello = || Ok(service_fn(|_req|{
-        Ok(Response::<hyper::Body>::new()
-            .with_header(ContentLength(TEXT.len() as u64))
-            .with_header(ContentType::plaintext())
-            .with_body(TEXT))
-    }));
-
-    let server = Http::new().bind(&addr, hello)?;
-    server.run()
+mod http {
+    use reqwest;
+    pub fn call_url(url: &str) -> reqwest::StatusCode {
+        let response = reqwest::get(&url[..]);
+        let result = match response {
+            Err(e) => panic!(e),
+            Ok(_) => response.unwrap().status(),
+        };
+        result
+    }
 }
 
-# fn main() {}
+#[cfg(test)]
+mod http_tests {
+    use super::*;
+    #[test]
+    #[should_panic]
+    fn test_http_panic() {
+        http::call_url("http://invalidhost:4000");
+    }
+    #[test]
+    fn test_http_ok() {
+        assert_eq!(reqwest::StatusCode::Ok,
+                   http::call_url("https://www.rust-lang.org"));
+    }
+}
+
 ~~~
 {: .language-rust}
 
-Obligatory link to <a href="https://en.wikipedia.org/wiki/Test-driven_development">Test Driven Design.</a>
+The above code is pretty straight forward, all it does it create our *"custom"* module that does HTTP calls.
+
+We have supplemented the same with a set of unit tests that should panic and one that should pass.
+
+<img src="{{"../assets/img/rusty_cmis/iii/reqwest_basic.png"}}"/>
+
+### Parsing a JSON Response 
+
+The defacto crate used by most rustacean for json manipulation is the <a href="https://serde.rs/">serde_json crate</a>, luckily for us this crate is used in the reqwest crate that we already imported.
+
+Lets try an http request to a publicly available user list <a href="https://jsonplaceholder.typicode.com/users">service</a>. The *users* endpoint of this service is supposed retunr a total of 10 users as a json body.
+
+Lets create another method that does a url invocation and returns the parsed json object.
+
 
 
 ### Onwards My Friend
@@ -116,7 +131,6 @@ script:
   - cargo test --verbose --all
 ~~~
 {: .language-yml}
-
 * Refresh the Travis CI page and if everything is configured properly you'll be greated with the expected red color text and failure.
 
 <img src="{{"../assets/img/rusty_cmis/ii/travis_test_fail.png"}}"/>
