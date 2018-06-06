@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Rusty CMIS Part IV"
+title:  "Dynamic Programming"
 date:   2017-08-01 00:00:06
 tags:
 description: 'Trying out a Dynamic Programming Problem in Rust'
