@@ -119,4 +119,5 @@ The CMIS_Client struct holds the authentication information, and the repository 
 Delta
 
 *DISCLAIMER: I AM IN THE PROCESS OF LEARNING RUST, PLEASE TAKE ALL THE CONTENT WITH A GRAIN OF SALT, AND DO PROVIDE FEEDBACK.*
+
 *Update : This series has been discontinued as I CMIS is no longer an actively used protocol on dropbox/googledrive*
