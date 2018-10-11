@@ -1,0 +1,55 @@
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    
+        <url>
+            <loc>https://deltamaniac.netlify.com/memoization/</loc>
+            
+                <lastmod>2017-08-12</lastmod>
+            
+        </url>
+    
+        <url>
+            <loc>https://deltamaniac.netlify.com/neural-net/</loc>
+            
+                <lastmod>2016-03-12</lastmod>
+            
+        </url>
+    
+    
+        <url>
+            <loc>https://deltamaniac.netlify.com/</loc>
+        </url>
+    
+    
+        
+        <url>
+            <loc>https://deltamaniac.netlify.com/categories/</loc>
+        </url>
+        
+        <url>
+            <loc>https://deltamaniac.netlify.com/categories/rust/</loc>
+        </url>
+        
+    
+        
+        <url>
+            <loc>https://deltamaniac.netlify.com/tags/</loc>
+        </url>
+        
+        <url>
+            <loc>https://deltamaniac.netlify.com/tags/ai/</loc>
+        </url>
+        
+        <url>
+            <loc>https://deltamaniac.netlify.com/tags/memoization/</loc>
+        </url>
+        
+        <url>
+            <loc>https://deltamaniac.netlify.com/tags/neural-network/</loc>
+        </url>
+        
+        <url>
+            <loc>https://deltamaniac.netlify.com/tags/rust/</loc>
+        </url>
+        
+    
+</urlset>

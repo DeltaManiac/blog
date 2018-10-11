@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+      <!-- Enable responsiveness on mobile devices-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+      <title></title>
+
+      
+
+      
+          <link rel="stylesheet" href="https://deltamaniac.netlify.com/site.css">
+      
+
+      
+      
+    </head>
+
+    <body class="hack dark main container">
+        
+
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+        <h1 itemprop="headline">A rod of made of metals</h1>
+        <span class="muted">
+    <svg style="margin-bottom:-3px" class="i-clock" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <circle cx="16" cy="16" r="14"/>
+        <path d="M16 8 L16 16 20 20"/>
+    </svg>
+    <span>4 minute read</span>
+    <svg style="margin-bottom: -3px" class="i-edit" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z"/>
+    </svg>
+
+    Published: 2017-08-12
+</span>
+    </header>
+    <div itemprop="articleBody">
+      <p>Try and solve a Dynamic Programming Problem in Rust.
+<a name="continue-reading"></a></p>
+<h1 id="the-problem"><a class="gutenberg-anchor" href="#the-problem" aria-label="Anchor link for: the-problem">🔗</a>
+The Problem</h1>
+<p>Bob wants to create a rod made of metals. The metals can be made of either Iron, Chromium, Aluminium, Silver or Gold (he need not use all five types of metals).</p>
+<p>Each metal has a value associated with it's strength as follows:</p>
+<pre style="background-color:#1e1e1e">
+<span style="background-color:#1e1e1e;color:#dcdcdc;">-2 for Iron
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">-1 for Chromium
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">0 for Aluminium
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">1 for Silver
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">2 for Gold
+</span></pre>
+<p>Each metal also has a cost given by I, C, A, S and G for the respective metal.</p>
+<p>You are given q queries. In each query, find the minimum cost for creating a rod using exactly M metals and overall strength of N.</p>
+<p>Overall strength N is defined as the sum of strength of each metal used in the rod.</p>
+<p>Input:</p>
+<p>First line contains 5 space separated integers I, C, A, S, G, the respective cost of metals. Next line contains q the number of queries next q lines had two integers M and N, the number of metals to be used and the overall strength.</p>
+<p>Output:</p>
+<p>For each query, output the answer in a new line. Output the minimum cost if it exists otherwise print -1.</p>
+<p>Constraints:</p>
+<pre style="background-color:#1e1e1e">
+<span style="background-color:#1e1e1e;color:#dcdcdc;">1 ≤ q ≤5 * 10^5
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">0 ≤ I, C, A, S, G ≤ 10^6
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">0 ≤ M ≤ 100
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">−200 ≤ N ≤ 200
+</span></pre>
+<p>Input:</p>
+<pre style="background-color:#1e1e1e">
+<span style="background-color:#1e1e1e;color:#dcdcdc;">2 2 3 4
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">3
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">0
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">-2
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">6
+</span></pre>
+<p>Output:</p>
+<pre style="background-color:#1e1e1e">
+<span style="background-color:#1e1e1e;color:#dcdcdc;">4
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">1
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">2
+</span></pre><h1 id="solution"><a class="gutenberg-anchor" href="#solution" aria-label="Anchor link for: solution">🔗</a>
+Solution</h1>
+<p>The solution given below solves the problem in 3 different ways</p>
+<ul>
+<li>Recursive Approach</li>
+<li>Bottom Up Approach</li>
+<li>Top Down Apprroach</li>
+</ul>
+<pre style="background-color:#1e1e1e">
+<span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">use </span><span style="background-color:#1e1e1e;color:#dcdcdc;">std::collections::HashMap;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">main() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> metal_str </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![</span><span style="background-color:#1e1e1e;color:#569cd6;">-</span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#569cd6;">-</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">];
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> metal_cost </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">3</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">4</span><span style="background-color:#1e1e1e;color:#dcdcdc;">];
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#b5cea8;">12</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost(metal_str.as_slice(), metal_cost.as_slice(), </span><span style="background-color:#1e1e1e;color:#b5cea8;">6</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">3</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#b5cea8;">4</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost(metal_str.as_slice(), metal_cost.as_slice(), </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost(metal_str.as_slice(), metal_cost.as_slice(), </span><span style="background-color:#1e1e1e;color:#569cd6;">-</span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">std::i32::</span><span style="background-color:#1e1e1e;color:#b4cea8;">MAX</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost(metal_str.as_slice(), metal_cost.as_slice(), </span><span style="background-color:#1e1e1e;color:#b5cea8;">22</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table: HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt;&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">HashMap::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#b5cea8;">12</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost_top_down(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str.as_slice(),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_cost.as_slice(),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#b5cea8;">6</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#b5cea8;">3</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">HashMap::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#b5cea8;">4</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost_top_down(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str.as_slice(),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_cost.as_slice(),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">HashMap::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost_top_down(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str.as_slice(),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_cost.as_slice(),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">-</span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">HashMap::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">std::i32::</span><span style="background-color:#1e1e1e;color:#b4cea8;">MAX</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost_top_down(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str.as_slice(),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_cost.as_slice(),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#b5cea8;">22</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#b5cea8;">12</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost_btm_up(metal_str.as_slice(), metal_cost.as_slice(), </span><span style="background-color:#1e1e1e;color:#b5cea8;">6</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">3</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#b5cea8;">4</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost_btm_up(metal_str.as_slice(), metal_cost.as_slice(), </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost_btm_up(metal_str.as_slice(), metal_cost.as_slice(), </span><span style="background-color:#1e1e1e;color:#569cd6;">-</span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">assert_eq!(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">std::i32::</span><span style="background-color:#1e1e1e;color:#b4cea8;">MAX</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost_btm_up(metal_str.as_slice(), metal_cost.as_slice(), </span><span style="background-color:#1e1e1e;color:#b5cea8;">22</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#608b4e;">//===========================//
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost_btm_up(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">[</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_cost: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">[</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_str: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_count: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">) -&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">i32 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table: HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">HashMap::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table.insert(</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, HashMap::new());
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table.get_mut(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">).unwrap().insert(</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">for</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> i </span><span style="background-color:#1e1e1e;color:#569cd6;">in </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#569cd6;">..</span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_count </span><span style="background-color:#1e1e1e;color:#569cd6;">+ </span><span style="background-color:#1e1e1e;color:#b5cea8;">1 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table.insert(i, HashMap::new());
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> prev_str_keys </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_keys_as_vec(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table, i);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">for</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> k </span><span style="background-color:#1e1e1e;color:#569cd6;">in</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> prev_str_keys {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">for</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> j </span><span style="background-color:#1e1e1e;color:#569cd6;">in </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#569cd6;">..</span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str.len() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> curr_cost </span><span style="background-color:#1e1e1e;color:#569cd6;">= *</span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table.get(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">(i </span><span style="background-color:#1e1e1e;color:#569cd6;">- </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)).unwrap().get(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">k).unwrap();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> new_cost </span><span style="background-color:#1e1e1e;color:#569cd6;">=</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> curr_cost </span><span style="background-color:#1e1e1e;color:#569cd6;">+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> metal_cost[j];
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#569cd6;">if</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table.contains_key(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">i)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;&amp; !</span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table.get(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">i).unwrap().contains_key(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">(metal_str[j] </span><span style="background-color:#1e1e1e;color:#569cd6;">+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> k))
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> idx </span><span style="background-color:#1e1e1e;color:#569cd6;">=</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> metal_str[j] </span><span style="background-color:#1e1e1e;color:#569cd6;">+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> k;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table.get_mut(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">i).unwrap().insert(idx, new_cost);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">} </span><span style="background-color:#1e1e1e;color:#569cd6;">else if</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> new_cost </span><span style="background-color:#1e1e1e;color:#569cd6;">&lt; *</span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table.get(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">i).unwrap().get(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">(metal_str[j] </span><span style="background-color:#1e1e1e;color:#569cd6;">+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> k)).unwrap() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                         </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> idx </span><span style="background-color:#1e1e1e;color:#569cd6;">=</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> metal_str[j] </span><span style="background-color:#1e1e1e;color:#569cd6;">+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> k;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table.get_mut(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">i).unwrap().insert(idx, new_cost);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">if</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table.contains_key(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_count) </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.get(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_count)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.unwrap()
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.contains_key(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_str)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">return *</span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.get(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_count)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.unwrap()
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.get(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_str)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.unwrap();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">} </span><span style="background-color:#1e1e1e;color:#569cd6;">else </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">return </span><span style="background-color:#1e1e1e;color:#dcdcdc;">std::i32::</span><span style="background-color:#1e1e1e;color:#b4cea8;">MAX</span><span style="background-color:#1e1e1e;color:#dcdcdc;">;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_keys_as_vec(dp_table: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt;, idx: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">) -&gt; Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> c: Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![];
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">for</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> i </span><span style="background-color:#1e1e1e;color:#569cd6;">in</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table.get(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">(idx </span><span style="background-color:#1e1e1e;color:#569cd6;">- </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)).unwrap().keys() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">c.push(</span><span style="background-color:#1e1e1e;color:#569cd6;">*</span><span style="background-color:#1e1e1e;color:#dcdcdc;">i);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">return</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> c;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#608b4e;">//===========================//
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">update_dp_table(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;mut </span><span style="background-color:#1e1e1e;color:#dcdcdc;">HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt;&gt;,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_str: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_cost: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_count: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">value: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">) {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">if !</span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table.contains_key(curr_str) {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table.insert(</span><span style="background-color:#1e1e1e;color:#569cd6;">*</span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_str, HashMap::new());
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">if !</span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table[curr_str].contains_key(curr_cost) {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.get_mut(curr_str)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.unwrap()
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.insert(</span><span style="background-color:#1e1e1e;color:#569cd6;">*</span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_cost, HashMap::new());
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">if !</span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table[curr_str][curr_cost].contains_key(curr_count) {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.get_mut(curr_str)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.unwrap()
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.get_mut(curr_cost)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.unwrap()
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.insert(</span><span style="background-color:#1e1e1e;color:#569cd6;">*</span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_cost, value);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost_top_down(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">[</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_cost: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">[</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_str: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_count: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_str: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_cost: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_count: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">mut </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;mut </span><span style="background-color:#1e1e1e;color:#dcdcdc;">HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, HashMap&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt;&gt;,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">) -&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">i32 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">if</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table.contains_key(curr_str)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table[curr_str].contains_key(curr_cost)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table[curr_str][curr_cost].contains_key(curr_count)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">return</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table[curr_str][curr_cost][curr_count];
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">} </span><span style="background-color:#1e1e1e;color:#569cd6;">else </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">if *</span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_count </span><span style="background-color:#1e1e1e;color:#569cd6;">==</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> target_count {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">if *</span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_str </span><span style="background-color:#1e1e1e;color:#569cd6;">==</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> target_str {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">update_dp_table(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table, curr_str, curr_cost, curr_count, </span><span style="background-color:#1e1e1e;color:#569cd6;">*</span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_cost);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#569cd6;">return *</span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_cost;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">} </span><span style="background-color:#1e1e1e;color:#569cd6;">else </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">update_dp_table(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_str,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_cost,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_count,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">std::i32::</span><span style="background-color:#1e1e1e;color:#b4cea8;">MAX</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#569cd6;">return </span><span style="background-color:#1e1e1e;color:#dcdcdc;">std::i32::</span><span style="background-color:#1e1e1e;color:#b4cea8;">MAX</span><span style="background-color:#1e1e1e;color:#dcdcdc;">;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">} </span><span style="background-color:#1e1e1e;color:#569cd6;">else </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> costs: Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![];
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">for</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> i </span><span style="background-color:#1e1e1e;color:#569cd6;">in </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#569cd6;">..</span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str.len() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">costs.push(get_min_cost_top_down(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_cost,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_str,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_count,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">(curr_str </span><span style="background-color:#1e1e1e;color:#569cd6;">+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> metal_str[i]),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">(curr_cost </span><span style="background-color:#1e1e1e;color:#569cd6;">+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> metal_cost[i]),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">(curr_count </span><span style="background-color:#1e1e1e;color:#569cd6;">+ </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">dp_table,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">));
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">update_dp_table(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> dp_table,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_str,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_cost,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_count,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#569cd6;">*</span><span style="background-color:#1e1e1e;color:#dcdcdc;">costs.iter().min().unwrap(),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">return *</span><span style="background-color:#1e1e1e;color:#dcdcdc;">costs.iter().min().unwrap();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#608b4e;">//===========================//
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">get_min_cost(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">[</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_cost: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">[</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_str: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_count: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_str: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_cost: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_count: </span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">) -&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">i32 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">if</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> curr_count </span><span style="background-color:#1e1e1e;color:#569cd6;">==</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> target_count {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">if</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> curr_str </span><span style="background-color:#1e1e1e;color:#569cd6;">==</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> target_str {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">return</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> curr_cost;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">} </span><span style="background-color:#1e1e1e;color:#569cd6;">else </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#569cd6;">return </span><span style="background-color:#1e1e1e;color:#dcdcdc;">std::i32::</span><span style="background-color:#1e1e1e;color:#b4cea8;">MAX</span><span style="background-color:#1e1e1e;color:#dcdcdc;">;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">} </span><span style="background-color:#1e1e1e;color:#569cd6;">else </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> costs: Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">i32</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![];
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">for</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> i </span><span style="background-color:#1e1e1e;color:#569cd6;">in </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#569cd6;">..</span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str.len() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">costs.push(get_min_cost(
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_str,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">metal_cost,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_str,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">target_count,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_str </span><span style="background-color:#1e1e1e;color:#569cd6;">+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> metal_str[i],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_cost </span><span style="background-color:#1e1e1e;color:#569cd6;">+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> metal_cost[i],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">curr_count </span><span style="background-color:#1e1e1e;color:#569cd6;">+ </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">));
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">return *</span><span style="background-color:#1e1e1e;color:#dcdcdc;">costs.iter().min().unwrap();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span></pre>
+<p>:wq</p>
+<p>Delta</p>
+
+    </div>
+
+    
+        <footer>
+            <hr>
+            <p>
+                
+                
+                    
+                    in <a href="https://deltamaniac.netlify.com/categories/rust/">Rust</a>
+                
+                
+                    and tagged
+                    
+                        <a href="https://deltamaniac.netlify.com/tags/memoization/">memoization</a>
+                        
+                            
+                                
+                                    and
+                                
+                            
+                        
+                    
+                        <a href="https://deltamaniac.netlify.com/tags/rust/">rust</a>
+                        
+                            
+                        
+                    
+                
+            </p>
+        </footer>
+    
+</article>
+
+
+    </body>
+
+</html>

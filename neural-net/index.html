@@ -1,0 +1,282 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+      <!-- Enable responsiveness on mobile devices-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+      <title></title>
+
+      
+
+      
+          <link rel="stylesheet" href="https://deltamaniac.netlify.com/site.css">
+      
+
+      
+      
+    </head>
+
+    <body class="hack dark main container">
+        
+
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+        <h1 itemprop="headline">Neural Nets an Initiation</h1>
+        <span class="muted">
+    <svg style="margin-bottom:-3px" class="i-clock" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <circle cx="16" cy="16" r="14"/>
+        <path d="M16 8 L16 16 20 20"/>
+    </svg>
+    <span>5 minute read</span>
+    <svg style="margin-bottom: -3px" class="i-edit" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z"/>
+    </svg>
+
+    Published: 2016-03-12
+</span>
+    </header>
+    <div itemprop="articleBody">
+      <p>This blog post is a knee jerk reaction after reading <a href="https://twitter.com/iamtrask">@iamtrask</a>'s excellent <a href="http://iamtrask.github.io/2015/07/12/basic-python-network/">blog post</a>.
+It provides a good entry point into neural networks and how it works (Treasure trove for the uninitiate like me). Most of this articles content is what <em>(I think)</em> I have understood after reading his post and a much more simpler write up of the same <a href="https://medium.com/technology-invention-and-more/how-to-build-a-simple-neural-network-in-9-lines-of-python-code-cc8f23647ca1">here</a>.
+<a name="continue-reading"></a>
+So with out much further ado let us begin,</p>
+<p>This is the python code snippet which is explained in trasks blog post (I will not be walking through this code as he does it way better than me).</p>
+<pre style="background-color:#1e1e1e">
+<span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#9b9b9b;">import </span><span style="background-color:#1e1e1e;color:#dcdcdc;">numpy </span><span style="background-color:#1e1e1e;color:#9b9b9b;">as </span><span style="background-color:#1e1e1e;color:#dcdcdc;">np
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#608b4e;"># sigmoid function
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">def </span><span style="background-color:#1e1e1e;color:#dcdcdc;">nonlin(x,deriv=</span><span style="background-color:#1e1e1e;color:#569cd6;">False</span><span style="background-color:#1e1e1e;color:#dcdcdc;">):
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">if</span><span style="background-color:#1e1e1e;color:#dcdcdc;">(deriv==</span><span style="background-color:#1e1e1e;color:#569cd6;">True</span><span style="background-color:#1e1e1e;color:#dcdcdc;">):
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">return </span><span style="background-color:#1e1e1e;color:#dcdcdc;">x*(</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">-x)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">return </span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">/(</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">+np.exp(-x))
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#608b4e;"># input dataset
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">X = np.array([  [</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">[</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">[</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">[</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">] ])
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#608b4e;"># output dataset            
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">y = np.array([[</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">]]).T
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#608b4e;"># seed random numbers to make calculation
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#608b4e;"># deterministic (just a good practice)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">np.random.seed(</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#608b4e;"># initialize weights randomly with mean 0
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">syn0 = </span><span style="background-color:#1e1e1e;color:#b5cea8;">2</span><span style="background-color:#1e1e1e;color:#dcdcdc;">*np.random.random((</span><span style="background-color:#1e1e1e;color:#b5cea8;">3</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)) - </span><span style="background-color:#1e1e1e;color:#b5cea8;">1
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">for </span><span style="background-color:#1e1e1e;color:#dcdcdc;">iter </span><span style="background-color:#1e1e1e;color:#569cd6;">in </span><span style="background-color:#1e1e1e;color:#dcdcdc;">xrange(</span><span style="background-color:#1e1e1e;color:#b5cea8;">10000</span><span style="background-color:#1e1e1e;color:#dcdcdc;">):
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#608b4e;"># forward propagation
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">l0 = X
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">l1 = nonlin(np.dot(l0,syn0))
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#608b4e;"># how much did we miss?
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">l1_error = y - l1
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#608b4e;"># multiply how much we missed by the 
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#608b4e;"># slope of the sigmoid at the values in l1
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">l1_delta = l1_error * nonlin(l1,</span><span style="background-color:#1e1e1e;color:#569cd6;">True</span><span style="background-color:#1e1e1e;color:#dcdcdc;">)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#608b4e;"># update weights
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">syn0 += np.dot(l0.T,l1_delta)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print </span><span style="background-color:#1e1e1e;color:#d69d85;">&quot;Output After Training:&quot;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print </span><span style="background-color:#1e1e1e;color:#dcdcdc;">l1
+</span></pre>
+<p>The above code runs iterations and adjusts the  synapses so as to make an informed decision for a given new input.</p>
+<p>Lets try that out by adding the following lines to the end of the script and running it.</p>
+<pre style="background-color:#1e1e1e">
+<span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print </span><span style="background-color:#1e1e1e;color:#d69d85;">&quot;Output After Training:&quot; 
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print </span><span style="background-color:#1e1e1e;color:#dcdcdc;">l1
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print </span><span style="background-color:#1e1e1e;color:#d69d85;">&quot;Testing the Neural Net&quot; 
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print </span><span style="background-color:#1e1e1e;color:#d69d85;">&quot;Input: 1,0,0&quot;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print  </span><span style="background-color:#1e1e1e;color:#dcdcdc;">nonlin(np.dot(np.array([[</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">]]),syn0))
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print </span><span style="background-color:#1e1e1e;color:#d69d85;">&quot;Input: 0,1,0&quot;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print </span><span style="background-color:#1e1e1e;color:#dcdcdc;">nonlin(np.dot(np.array([[</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">]]),syn0))
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print </span><span style="background-color:#1e1e1e;color:#d69d85;">&quot;Input: 0,0,1&quot;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">print </span><span style="background-color:#1e1e1e;color:#dcdcdc;">nonlin(np.dot(np.array([[</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">,</span><span style="background-color:#1e1e1e;color:#b5cea8;">1</span><span style="background-color:#1e1e1e;color:#dcdcdc;">]]),syn0))
+</span></pre>
+<p>The output is as below</p>
+<pre style="background-color:#1e1e1e">
+<span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Output After Training:
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">[[ 0.00301758]        
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">  </span><span style="background-color:#1e1e1e;color:#dcdcdc;">[ 0.00246109]        
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">  </span><span style="background-color:#1e1e1e;color:#dcdcdc;">[ 0.99799161]        
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">  </span><span style="background-color:#1e1e1e;color:#dcdcdc;">[ 0.99753723]]       
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Testing the Neural Net
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Input: 1,0,0          
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">[[ 0.99999391]]       
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Input: 0,1,0          
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">[[ 0.4490743]]        
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Input: 0,0,1          
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">[[ 0.00301757]]       
+</span></pre>
+<p>We get the output which shows that our Network has learnt that if the first input value is a '1' then the output is a '1'<em>(0.999999)</em>.</p>
+<p>I ported the code <a href="https://gist.githubusercontent.com/miloharper/c5db6590f26d99ab2670/raw/bff459fbd922a31bc3988632cafb1687699a8d11/main.py">here </a> into Rust and it looks like this.</p>
+<pre style="background-color:#1e1e1e">
+<span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">extern crate</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> rand;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">use </span><span style="background-color:#1e1e1e;color:#dcdcdc;">rand::Rng;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">main() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> rng </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">rand::thread_rng();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> syn_weight: Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">for _ in </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#569cd6;">..</span><span style="background-color:#1e1e1e;color:#b5cea8;">3 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">syn_weight.push(rng.gen_range::&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;(</span><span style="background-color:#1e1e1e;color:#569cd6;">-</span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">));
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> input_set: Vec&lt;Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![vec![</span><span style="background-color:#1e1e1e;color:#b5cea8;">0.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                                         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![</span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                                         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![</span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">],
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                                         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![</span><span style="background-color:#1e1e1e;color:#b5cea8;">0.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">]];
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> output_set: Vec&lt;Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![vec![</span><span style="background-color:#1e1e1e;color:#b5cea8;">0.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">], vec![</span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">], vec![</span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">], vec![</span><span style="background-color:#1e1e1e;color:#b5cea8;">0.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">]];
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">for _ in </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#569cd6;">..</span><span style="background-color:#1e1e1e;color:#b5cea8;">10000000 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_dot(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">input_set, </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">syn_weight);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> output </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_sigmoid(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_dot(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">input_set, </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">syn_weight));
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> error: Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">for </span><span style="background-color:#1e1e1e;color:#dcdcdc;">(idx, val) </span><span style="background-color:#1e1e1e;color:#569cd6;">in</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> output_set.iter().enumerate() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">error.push(val[</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">] </span><span style="background-color:#1e1e1e;color:#569cd6;">-</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> output[idx]);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> derivative </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_sigmoid_derivative(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">output);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> result: Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">for </span><span style="background-color:#1e1e1e;color:#dcdcdc;">(idx, val) </span><span style="background-color:#1e1e1e;color:#569cd6;">in</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> derivative.iter().enumerate() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">result.push(val </span><span style="background-color:#1e1e1e;color:#569cd6;">*</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> error[idx]);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">syn_weight </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_add(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">(vec_dot(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">(vec_transpose(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">input_set)), </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">result)),
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">                              </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">syn_weight);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> test_input: Vec&lt;Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec![vec![</span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, </span><span style="background-color:#1e1e1e;color:#b5cea8;">0.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">]];
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">println!(</span><span style="background-color:#1e1e1e;color:#d69d85;">&quot;Output&quot;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">println!(</span><span style="background-color:#1e1e1e;color:#d69d85;">&quot;</span><span style="background-color:#1e1e1e;color:#b4cea8;">{:?}</span><span style="background-color:#1e1e1e;color:#d69d85;">&quot;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">, vec_sigmoid(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_dot(</span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">test_input, </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">syn_weight)));
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_transpose(input: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec&lt;Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt;) -&gt; Vec&lt;Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt; {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> outer: Vec&lt;Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">for</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> z </span><span style="background-color:#1e1e1e;color:#569cd6;">in </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#569cd6;">..</span><span style="background-color:#1e1e1e;color:#dcdcdc;">input[</span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">].len() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> inner: Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">for</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> y </span><span style="background-color:#1e1e1e;color:#569cd6;">in </span><span style="background-color:#1e1e1e;color:#b5cea8;">0</span><span style="background-color:#1e1e1e;color:#569cd6;">..</span><span style="background-color:#1e1e1e;color:#dcdcdc;">input.len() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">inner.push(input[y][z]);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">outer.push(inner);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">outer
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_add(x: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;, y: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;) -&gt; Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">x.into_iter()
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.zip(y.into_iter())
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.map(|(a, b)| a </span><span style="background-color:#1e1e1e;color:#569cd6;">+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> b)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.collect::&lt;Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt;()
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">sigmoid(x: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">) -&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">f64 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0 </span><span style="background-color:#1e1e1e;color:#569cd6;">/ </span><span style="background-color:#1e1e1e;color:#dcdcdc;">(</span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0 </span><span style="background-color:#1e1e1e;color:#569cd6;">+ </span><span style="background-color:#1e1e1e;color:#dcdcdc;">((</span><span style="background-color:#1e1e1e;color:#569cd6;">-</span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0 </span><span style="background-color:#1e1e1e;color:#569cd6;">*</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> x).exp()))
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_sigmoid(x: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;) -&gt; Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">x.into_iter().map(sigmoid).collect::&lt;Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt;()
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">sigmoid_derivative(x: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">) -&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">f64 </span><span style="background-color:#1e1e1e;color:#dcdcdc;">{
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">x </span><span style="background-color:#1e1e1e;color:#569cd6;">* </span><span style="background-color:#1e1e1e;color:#dcdcdc;">(</span><span style="background-color:#1e1e1e;color:#b5cea8;">1.0 </span><span style="background-color:#1e1e1e;color:#569cd6;">-</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> x)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_sigmoid_derivative(x: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;) -&gt; Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">x.into_iter()
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.map(sigmoid_derivative)
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">.collect::&lt;Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt;()
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#569cd6;">fn </span><span style="background-color:#1e1e1e;color:#dcdcdc;">vec_dot(x: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec&lt;Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;&gt;, y: </span><span style="background-color:#1e1e1e;color:#569cd6;">&amp;</span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt;) -&gt; Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> result: Vec&lt;</span><span style="background-color:#1e1e1e;color:#569cd6;">f64</span><span style="background-color:#1e1e1e;color:#dcdcdc;">&gt; </span><span style="background-color:#1e1e1e;color:#569cd6;">= </span><span style="background-color:#1e1e1e;color:#dcdcdc;">Vec::new();
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#569cd6;">for</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> val </span><span style="background-color:#1e1e1e;color:#569cd6;">in</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> x.iter() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">let mut</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> sum: </span><span style="background-color:#1e1e1e;color:#569cd6;">f64 = </span><span style="background-color:#1e1e1e;color:#b5cea8;">0.0</span><span style="background-color:#1e1e1e;color:#dcdcdc;">;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#569cd6;">for </span><span style="background-color:#1e1e1e;color:#dcdcdc;">(idx_inner, value) </span><span style="background-color:#1e1e1e;color:#569cd6;">in</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> y.iter().enumerate() {
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">             </span><span style="background-color:#1e1e1e;color:#dcdcdc;">sum </span><span style="background-color:#1e1e1e;color:#569cd6;">+=</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> val[idx_inner] </span><span style="background-color:#1e1e1e;color:#569cd6;">*</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> value;
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">         </span><span style="background-color:#1e1e1e;color:#dcdcdc;">result.push(sum);
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;">     </span><span style="background-color:#1e1e1e;color:#dcdcdc;">result
+</span><span style="background-color:#1e1e1e;color:#dcdcdc;"> </span><span style="background-color:#1e1e1e;color:#dcdcdc;">}
+</span></pre>
+<p>Since I am just a rust initiate I had my code reviewed by people on the internet <a href="https://www.reddit.com/r/rust/comments/65h97i/review_and_feedback_of_first_rust_code_for_a/">here</a>. The people over at the <a href="https://www.reddit.com/r/rust/">Rust</a> subreddit are quite friendly folk, I'd encourage you to head on over there for more exciting info about rust.</p>
+<h2 id="benchmarking-performance"><a class="gutenberg-anchor" href="#benchmarking-performance" aria-label="Anchor link for: benchmarking-performance">🔗</a>
+Benchmarking Performance</h2>
+<p>Rust boasts about being a blazingly fast language powered by LLVM.</p>
+<p>Lets checkout that claim.</p>
+<p>I bumped up the iteration to teach my network to 10 million and did a simple benchmark with the <a href="https://en.wikipedia.org/wiki/Time_(Unix)">time</a> command.</p>
+<p>First the Python code</p>
+<p><img src="/images/neural_net/python_benchmark.png" alt="" /></p>
+<p>It takes about 110 seconds to the completely train over 10 million iterations and predict an output for the unkown case of [1,0,0]. Not bad at all!</p>
+<p>Next the Rust code</p>
+<p><img src="/images/neural_net/rust_debug_benchmark.png" alt="" /></p>
+<p>It takes about 135 seconds to the completely train over 10 million iterations and predict an output for the unkown case of [1,0,0]. I was not impressed at the numbers at all. We can quickly figure out that this was run on a debug + unoptimized version of the binary.</p>
+<p>Next the Rust code Release Build</p>
+<p><img src="/images/neural_net/rust_release_benchmark.png" alt="" /></p>
+<p><img src="/images/neural_net/jaw_drop.png" alt="" /></p>
+<p>^^ That was my reaction literally follow by a few dirty words after seeing the result. Just approximately 4 seconds to do the entire 10 million iteration and compute a result. Boy am I Impressed!</p>
+<p>I am not doing the math as the % of improvement is definitely high up than I expected. I am sold on Rust at this point and will definitely try out more stuff in Rust.</p>
+<p>Guess thats all that I have for now and feel free to drop me a mail with your thoughts and comments.</p>
+<p>PS: I know that time is not the right benchmarking tool, and about cache misses and so... This not the actual performance comparison but just my observation. Take it with a grain of salt.</p>
+<p>Cheers</p>
+<p>Delta</p>
+
+    </div>
+
+    
+        <footer>
+            <hr>
+            <p>
+                
+                
+                    
+                    in <a href="https://deltamaniac.netlify.com/categories/rust/">Rust</a>
+                
+                
+                    and tagged
+                    
+                        <a href="https://deltamaniac.netlify.com/tags/ai/">AI</a>
+                        
+                            
+                                
+                                    ,
+                                
+                            
+                        
+                    
+                        <a href="https://deltamaniac.netlify.com/tags/rust/">rust</a>
+                        
+                            
+                                
+                                    and
+                                
+                            
+                        
+                    
+                        <a href="https://deltamaniac.netlify.com/tags/neural-network/">neural network</a>
+                        
+                            
+                        
+                    
+                
+            </p>
+        </footer>
+    
+</article>
+
+
+    </body>
+
+</html>

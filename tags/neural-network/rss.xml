@@ -1,0 +1,22 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title></title>
+        <link>https://deltamaniac.netlify.com/</link>
+        <description></description>
+        <generator>Gutenberg</generator>
+        <language>en</language>
+        <atom:link href="https://deltamaniac.netlify.com/tags/neural-network/rss.xml/" rel="self" type="application/rss+xml"/>
+        <lastBuildDate>Sat, 12 Mar 2016 00:00:00 +0000</lastBuildDate>
+        
+            <item>
+                <title>Neural Nets an Initiation</title>
+                <pubDate>Sat, 12 Mar 2016 00:00:00 +0000</pubDate>
+                <link>https://deltamaniac.netlify.com/neural-net/</link>
+                <guid>https://deltamaniac.netlify.com/neural-net/</guid>
+                <description>&lt;p&gt;This blog post is a knee jerk reaction after reading &lt;a href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;iamtrask&quot;&gt;@iamtrask&lt;&#x2F;a&gt;&#x27;s excellent &lt;a href=&quot;http:&#x2F;&#x2F;iamtrask.github.io&#x2F;2015&#x2F;07&#x2F;12&#x2F;basic-python-network&#x2F;&quot;&gt;blog post&lt;&#x2F;a&gt;.
+It provides a good entry point into neural networks and how it works (Treasure trove for the uninitiate like me). Most of this articles content is what &lt;em&gt;(I think)&lt;&#x2F;em&gt; I have understood after reading his post and a much more simpler write up of the same &lt;a href=&quot;https:&#x2F;&#x2F;medium.com&#x2F;technology-invention-and-more&#x2F;how-to-build-a-simple-neural-network-in-9-lines-of-python-code-cc8f23647ca1&quot;&gt;here&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+</description>
+            </item>
+        
+    </channel>
+</rss>

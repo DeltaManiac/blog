@@ -1,0 +1,21 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title></title>
+        <link>https://deltamaniac.netlify.com/</link>
+        <description></description>
+        <generator>Gutenberg</generator>
+        <language>en</language>
+        <atom:link href="https://deltamaniac.netlify.com/tags/memoization/rss.xml/" rel="self" type="application/rss+xml"/>
+        <lastBuildDate>Sat, 12 Aug 2017 00:00:00 +0000</lastBuildDate>
+        
+            <item>
+                <title>A rod of made of metals</title>
+                <pubDate>Sat, 12 Aug 2017 00:00:00 +0000</pubDate>
+                <link>https://deltamaniac.netlify.com/memoization/</link>
+                <guid>https://deltamaniac.netlify.com/memoization/</guid>
+                <description>&lt;p&gt;Try and solve a Dynamic Programming Problem in Rust.&lt;&#x2F;p&gt;
+</description>
+            </item>
+        
+    </channel>
+</rss>
