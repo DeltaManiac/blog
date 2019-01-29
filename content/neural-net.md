@@ -1,7 +1,7 @@
 +++
 title = "Neural Nets an Initiation"
 description= "A short expirement with Neural Networks"
-date =   2016-03-12 
+date =   2016-03-12
 in_search_index = true
 [taxonomies]
 tags = ["AI","rust","neural network"]

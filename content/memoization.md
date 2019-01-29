@@ -1,7 +1,7 @@
 +++
-title = "A rod of made of metals"
+title = "A Rod Made Of Metals"
 description= "Trying out a memoization in Rust"
-date = 2017-08-12 
+date = 2017-08-12
 in_search_index = true
 [taxonomies]
 tags = ["memoization","rust"]
